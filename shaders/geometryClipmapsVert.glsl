@@ -18,7 +18,7 @@ out vec2 vertPos;
 
 void main(){
    vec4 pos = scale * (offset+vec4(vertexPosition, 1.0));
-   vec4 pos_map = ((pos+map_position) * 0.5)+0.5;
+   vec4 pos_map = ((pos+map_position) * 0.125)+0.5;
    pos.y = float(texture(geoTexture, pos_map.xz).r * texture(geoTexture, pos_map.xz).g + texture(geoTexture, pos_map.xz).b);
    height = pos.y/3.0;
    pos.y*=heightScale;

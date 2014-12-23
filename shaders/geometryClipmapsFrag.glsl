@@ -90,8 +90,8 @@ void main(){
   vec3 texColour = /* calcColour().rgb;/*/texture(colourMap, texCoords).rgb;// vec3(0.9, 0.1, 0.1);
   vec3 colour = mix(fog.colour, texColour, fogFactor);
 
-//  fragColour =texture(normalMap, texCoords);
-  fragColour = vec4(colour, 1.0);
+  fragColour =texture(colourMap, texCoords);
+//  fragColour = vec4(colour, 1.0);
 //  fragColour = calcColour();
   //fragColour = vec4(height, height, height, 1.0);
   //fragColour = texture(grassTexture, texCoords);

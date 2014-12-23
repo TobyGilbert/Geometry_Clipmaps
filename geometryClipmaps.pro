@@ -114,5 +114,6 @@ OTHER_FILES += \
     textures/result2.png \
     shaders/grassHairVert.glsl\
     shaders/grassHairFrag.glsl \
-    shaders/grassHairGeom.glsl
+    shaders/grassHairGeom.glsl \
+    textures/t.png
 

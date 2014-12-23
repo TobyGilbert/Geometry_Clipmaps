@@ -10,7 +10,7 @@
 
 
 const static float INCREMENT=0.01;
-const static float ZOOM=0.005;
+const static float ZOOM=0.5;
 
 
 
@@ -31,7 +31,6 @@ OpenGLWidget::~OpenGLWidget(){
     delete m_cam;
     delete m_geometryClipmap;
     delete m_sky;
-    //delete m_grass;
 }
 //----------------------------------------------------------------------------------------------------------------------
 void OpenGLWidget::initializeGL(){
@@ -51,9 +50,7 @@ void OpenGLWidget::initializeGL(){
     m_cam = new Camera(glm::vec3(0.0, 0.3, 0.10), width(), height(), glm::vec3(0.0, 1.0, 0.0));
 
     // Create Geometry
-    m_geometryClipmap = new GeometryClipmap(6);
-
-    //m_grass = new grassHair(m_geometryClipmap->m_VAO);
+    m_geometryClipmap = new GeometryClipmap(5);
 
     //Create Skybox
     m_sky = new Skybox();
@@ -114,7 +111,6 @@ void OpenGLWidget::paintGL(){
     m_modelMatrix = glm::mat4(1.0);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 1.0, 5.0));
-    //m_grass->draw(m_modelMatrix, m_cam, 100);
 
 }
 //----------------------------------------------------------------------------------------------------------------------
