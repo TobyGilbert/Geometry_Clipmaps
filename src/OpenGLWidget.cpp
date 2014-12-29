@@ -1,18 +1,16 @@
-#include <QGuiApplication>
-
 #include "OpenGLWidget.h"
+
+#include <QGuiApplication>
 #include <iostream>
 #include <QCursor>
 #include <sys/time.h>
 #include <OpenGL/glu.h>
 #include <cmath>
-#include "Bmp.h"
 
+#include "Bmp.h"
 
 const static float INCREMENT=0.01;
 const static float ZOOM=0.5;
-
-
 
 OpenGLWidget::OpenGLWidget(const QGLFormat _format, QWidget *_parent) : QGLWidget(_format,_parent), m_wireframe(false), m_cutout(false){
     // set this widget to have the initial keyboard focus
@@ -39,8 +37,6 @@ void OpenGLWidget::initializeGL(){
     glClearDepth(1.0f);
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_FRONT);
     // enable depth testing for drawing
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -82,7 +78,6 @@ void OpenGLWidget::paintGL(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     //Initialise the model matrix
     glm::mat4 rotx;
     glm::mat4 roty;
@@ -120,6 +115,7 @@ void OpenGLWidget::paintGL(){
     m_water->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     m_water->render();
 
+    // Draw declan's meso terrain
     glDisable(GL_BLEND);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 5.0, 5.0));
@@ -163,7 +159,6 @@ void OpenGLWidget::mouseMoveEvent (QMouseEvent * _event)
        m_spinYFace += (float) 0.05f * diffx;
        m_origX = _event->x();
        m_origY = _event->y();
-
     }
     // right mouse translate code
     else if(m_translate && _event->buttons() == Qt::RightButton)
@@ -174,32 +169,12 @@ void OpenGLWidget::mouseMoveEvent (QMouseEvent * _event)
        m_origYPos=_event->y();
        m_modelPos.x += INCREMENT * diffX;
        m_modelPos.y -= INCREMENT * diffY;
-
      }
 }
 //----------------------------------------------------------------------------------------------------------------------
 void OpenGLWidget::keyPressEvent(QKeyEvent *_event){
-
     switch(_event->key()){
     case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
-
-    //calculate our camera rotations
-    case Qt::Key_W:
-//        m_geometryClipmap->setUpdating(true);
-        //m_geometryClipmap->moveCamera(glm::vec3(0.0, 0.0, -m_cameraSpeed));
-    break;
-    case Qt::Key_S:
-//        m_geometryClipmap->setUpdating(true);
-        //m_geometryClipmap->moveCamera(glm::vec3(0.0, 0.0, m_cameraSpeed));
-    break;
-    case Qt::Key_A:
-//        m_geometryClipmap->setUpdating(true);
-        //m_geometryClipmap->moveCamera(glm::vec3(-m_cameraSpeed, 0.0, 0.0));
-    break;
-    case Qt::Key_D:
-//        m_geometryClipmap->setUpdating(true);
-        //m_geometryClipmap->moveCamera(glm::vec3(m_cameraSpeed, 0.0, 0.0));
-    break;
     case Qt::Key_4:
         m_wireframe = true;
     break;
