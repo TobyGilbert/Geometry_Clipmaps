@@ -4,9 +4,9 @@ Camera::Camera(glm::vec3 _pos, int _width, int _height, glm::vec3 _up){
    m_position = _pos;
    m_up = _up;
    m_fov = 45.0;
-   m_aspect = float(_width/_height);
+   m_aspect = float(_width/(_height));
    m_projectionMatrix = glm::perspective(m_fov, m_aspect, 0.1f, 30000.0f);
-   lookAt(m_position, glm::vec3(0.0, 0.0, -2.0), m_up);
+   lookAt(m_position, glm::vec3(0.0, 0.0, -10.0), m_up);
 }
 
 Camera::~Camera(){

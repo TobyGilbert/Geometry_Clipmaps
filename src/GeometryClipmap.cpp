@@ -3,18 +3,20 @@
 #include <QGLWidget>
 #include <OpenGL/glu.h>
 #include <noise/noise.h>
+#include <glm/gtc/matrix_inverse.hpp>
 #include "noiseutils.h"
 #include "Bmp.h"
 
-int width=512,height=512;
-float INCRIMENT = 0.005;
+int width=1024,height=1024;
+float INCRIMENT = 0.01;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-GeometryClipmap::GeometryClipmap(int _levels): m_gridSize(32), m_wireframe(false), m_cutout(false), m_height(0.1), m_updating(false){
+GeometryClipmap::GeometryClipmap(int _levels): m_gridSize(32), m_wireframe(false), m_cutout(false), m_height(2.0), m_updating(false){
     m_levels = _levels;
     m_viewPos = glm::vec3(0.0, 0.0, 0.0);
     m_xvalue = 2;
-    m_zvalue = 1;
+    m_zvalue = 2;
+
     createShader();
     Initialise();
 }
@@ -53,20 +55,19 @@ void GeometryClipmap::createShader(){
 
     m_cutoutLoc = m_shaderProgram->getUniformLoc("cutout");
     m_heightLoc = m_shaderProgram->getUniformLoc("heightScale");
+    GLuint fogMinLoc = m_shaderProgram->getUniformLoc("fogMin");
+    GLuint fogMaxLoc = m_shaderProgram->getUniformLoc("fogMax");
 
-    GLuint fogMaxLoc = m_shaderProgram->getUniformLoc("fog.maxDistance");
-    GLuint fogMinLoc = m_shaderProgram->getUniformLoc("fog.minDistance");
-    GLuint fogColourLoc = m_shaderProgram->getUniformLoc("fog.colour");
     GLuint mudHeightLoc = m_shaderProgram->getUniformLoc("mudHeight");
     GLuint grassHeightLoc = m_shaderProgram->getUniformLoc("grassHeight");
     GLuint rockHeightLoc = m_shaderProgram->getUniformLoc("rockHeight");
 
-    glUniform1f(fogMaxLoc, 1.0);
-    glUniform1f(fogMinLoc, 0.4);
-    glUniform3f(fogColourLoc, 0.898 ,0.980, 1.0);
+
     glUniform1f(mudHeightLoc, 0.13);
     glUniform1f(grassHeightLoc, 0.2);
     glUniform1f(rockHeightLoc, 0.4);
+    glUniform1f(fogMinLoc, 3.0);
+    glUniform1f(fogMaxLoc, 4.0);
 
     // driver info
     std::cout<<"GL_VERSION: "<<glGetString(GL_VERSION)<<std::endl;
@@ -77,33 +78,28 @@ void GeometryClipmap::createShader(){
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::Initialise(){
 
-    noise::module::Perlin perlin;
-    utils::NoiseMap noisemap;
-    utils::NoiseMapBuilderPlane heightmapBuilder;
-    heightmapBuilder.SetSourceModule(perlin);
-    heightmapBuilder.SetDestNoiseMap(noisemap);
-    heightmapBuilder.SetDestSize(512, 512);
+    m_heightmapBuilder.SetSourceModule(m_perlin);
+    m_heightmapBuilder.SetDestNoiseMap(m_noisemap);
+    m_heightmapBuilder.SetDestSize(1024, 1024);
     //heightmapBuilder.SetBounds(m_xvalue, m_xvalue+4.0, m_zvalue, m_zvalue+4.0);
-    heightmapBuilder.SetBounds(2.0, 6.0, 1.0, 5.0);
-    heightmapBuilder.Build();
+    m_heightmapBuilder.SetBounds(2.0, 6.0, 2.0, 6.0);
+    m_heightmapBuilder.Build();
 
-    utils::RendererImage heightmap;
-    utils::Image image;
-    heightmap.SetSourceNoiseMap(noisemap);
-    heightmap.SetDestImage(image);
-    heightmap.Render();
+    m_heightmap.SetSourceNoiseMap(m_noisemap);
+    m_heightmap.SetDestImage(m_image);
+    m_heightmap.Render();
 
-    utils::WriterBMP writer;
-    writer.SetSourceImage(image);
-    writer.SetDestFilename("textures/myPerlinHeightmap.bmp");
-    writer.WriteDestFile();
+    m_writer.SetSourceImage(m_image);
+    m_writer.SetDestFilename("textures/myPerlinHeightmap.bmp");
+    m_writer.WriteDestFile();
 
     m_heightmapTex = new Texture("textures/myPerlinHeightmap.bmp");
+//    m_heightmapTex = new Texture("textures/declanHeightmap.jpg");
 
     noise::utils::RendererNormalMap normalMapRenderer;
     noise::utils::Image normalImage;
-    normalImage.SetSize(512, 512);
-    normalMapRenderer.SetSourceNoiseMap(noisemap);
+    normalImage.SetSize(1024, 1024);
+    normalMapRenderer.SetSourceNoiseMap(m_noisemap);
     normalMapRenderer.SetDestImage(normalImage);
 
     normalMapRenderer.Render();
@@ -115,28 +111,26 @@ void GeometryClipmap::Initialise(){
 
     m_normalmapTex = new Texture("textures/myPerlinNormalMap.bmp");
 
-    utils::RendererImage colourMap;
-    utils::Image imageColour;
-    colourMap.SetSourceNoiseMap(noisemap);
-    colourMap.SetDestImage(imageColour);
-    colourMap.ClearGradient();
-    colourMap.AddGradientPoint(-1.0000, utils::Color(  0,   0, 128, 255)); // deeps
-    colourMap.AddGradientPoint(-0.2500, utils::Color(  0,   0, 255, 255)); // shallow
-    colourMap.AddGradientPoint( 0.0000, utils::Color(  0, 128, 255, 255)); // shore
-    colourMap.AddGradientPoint( 0.0625, utils::Color(240, 240,  64, 255)); // sand
-    colourMap.AddGradientPoint( 0.1250, utils::Color( 32, 160,   0, 255)); // grass
-    colourMap.AddGradientPoint( 0.3750, utils::Color(224, 224,   0, 255)); // dirt
-    colourMap.AddGradientPoint( 0.7500, utils::Color(128, 128, 128, 255)); // rock
-    colourMap.AddGradientPoint( 1.0000, utils::Color(255, 255, 255, 255)); // snow
-    colourMap.EnableLight();
-    colourMap.SetLightContrast(3.0);
-    colourMap.SetLightBrightness(2.0);
-    colourMap.Render();
+    //utils::RendererImage colourMap;
+    m_colourMap.SetSourceNoiseMap(m_noisemap);
+    m_colourMap.SetDestImage(m_imageColour);
+    m_colourMap.ClearGradient();
+    m_colourMap.AddGradientPoint(-1.0000, utils::Color(  50,   50, 50, 255)); // deeps
+    m_colourMap.AddGradientPoint(-0.2500, utils::Color(  110,   110, 110, 255)); // shallow
+    m_colourMap.AddGradientPoint( 0.0000, utils::Color(  140, 140, 140, 255)); // shore
+    m_colourMap.AddGradientPoint( 0.0625, utils::Color(234, 220,  194, 255)); // sand
+    m_colourMap.AddGradientPoint( 0.1250, utils::Color( 79, 106,   53, 255)); // grass
+    m_colourMap.AddGradientPoint( 0.3750, utils::Color(157, 127,   75, 255)); // dirt
+    m_colourMap.AddGradientPoint( 0.7500, utils::Color(143, 135, 124, 255)); // rock
+    m_colourMap.AddGradientPoint( 1.0000, utils::Color(255, 255, 255, 255)); // snow
+    m_colourMap.EnableLight();
+    m_colourMap.SetLightContrast(5.0);
+    m_colourMap.SetLightBrightness(2.0);
+    m_colourMap.Render();
 
-    utils::WriterBMP writerColour;
-    writerColour.SetSourceImage(imageColour);
-    writerColour.SetDestFilename("textures/myPerlinColourmap.bmp");
-    writerColour.WriteDestFile();
+    m_writerColour.SetSourceImage(m_imageColour);
+    m_writerColour.SetDestFilename("textures/myPerlinColourmap.bmp");
+    m_writerColour.WriteDestFile();
 
     m_colourTex = new Texture("textures/myPerlinColourmap.bmp");
 
@@ -183,56 +177,47 @@ void GeometryClipmap::Initialise(){
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::update(){
     // Generate new height map
-    //m_xvalue += INCRIMENT;
-    m_zvalue += INCRIMENT;
-
     if (m_updating){
-        noise::module::Perlin perlin;
-        utils::NoiseMap noisemap;
-        utils::NoiseMapBuilderPlane heightmapBuilder;
-        heightmapBuilder.SetSourceModule(perlin);
-        heightmapBuilder.SetDestNoiseMap(noisemap);
-        heightmapBuilder.SetDestSize(512, 512);
-        heightmapBuilder.SetBounds(m_xvalue, m_xvalue+4.0, m_zvalue, m_zvalue+4.0);
-        heightmapBuilder.Build();
+        m_zvalue -= INCRIMENT;
 
-        utils::RendererImage heightmap;
-        utils::Image image;
-        heightmap.SetSourceNoiseMap(noisemap);
-        heightmap.SetDestImage(image);
-        heightmap.Render();
+        m_heightmapBuilder.SetSourceModule(m_perlin);
+        m_heightmapBuilder.SetDestNoiseMap(m_noisemap);
+        m_heightmapBuilder.SetDestSize(512, 512);
+        m_heightmapBuilder.SetBounds(m_xvalue, m_xvalue+4.0, m_zvalue, m_zvalue+4.0);
+        m_heightmapBuilder.Build();
 
-        utils::WriterBMP writer;
-        writer.SetSourceImage(image);
-        writer.SetDestFilename("textures/myPerlinHeightmap.bmp");
-        writer.WriteDestFile();
+        m_heightmap.SetSourceNoiseMap(m_noisemap);
+        m_heightmap.SetDestImage(m_image);
+        m_heightmap.Render();
+
+        m_writer.SetSourceImage(m_image);
+        m_writer.SetDestFilename("textures/myPerlinHeightmap.bmp");
+        m_writer.WriteDestFile();
 
         delete m_heightmapTex;
 
         m_heightmapTex = new Texture("textures/myPerlinHeightmap.bmp");
+//        m_heightmapTex = new Texture("textures/declanHeightmap.jpg");
 
-        utils::RendererImage colourMap;
-        utils::Image imageColour;
-        colourMap.SetSourceNoiseMap(noisemap);
-        colourMap.SetDestImage(imageColour);
-        colourMap.ClearGradient();
-        colourMap.AddGradientPoint(-1.0000, utils::Color(  0,   0, 128, 255)); // deeps
-        colourMap.AddGradientPoint(-0.2500, utils::Color(  0,   0, 255, 255)); // shallow
-        colourMap.AddGradientPoint( 0.0000, utils::Color(  0, 128, 255, 255)); // shore
-        colourMap.AddGradientPoint( 0.0625, utils::Color(240, 240,  64, 255)); // sand
-        colourMap.AddGradientPoint( 0.1250, utils::Color( 32, 160,   0, 255)); // grass
-        colourMap.AddGradientPoint( 0.3750, utils::Color(224, 224,   0, 255)); // dirt
-        colourMap.AddGradientPoint( 0.7500, utils::Color(128, 128, 128, 255)); // rock
-        colourMap.AddGradientPoint( 1.0000, utils::Color(255, 255, 255, 255)); // snow
-        colourMap.EnableLight();
-        colourMap.SetLightContrast(3.0);
-        colourMap.SetLightBrightness(2.0);
-        colourMap.Render();
+        m_colourMap.SetSourceNoiseMap(m_noisemap);
+        m_colourMap.SetDestImage(m_imageColour);
+        m_colourMap.ClearGradient();
+        m_colourMap.AddGradientPoint(-1.0000, utils::Color(  50,   50, 50, 255)); // deeps
+        m_colourMap.AddGradientPoint(-0.2500, utils::Color(  110,   110, 110, 255)); // shallow
+        m_colourMap.AddGradientPoint( 0.0000, utils::Color(  140, 140, 140, 255)); // shore
+        m_colourMap.AddGradientPoint( 0.0625, utils::Color(234, 220,  194, 255)); // sand
+        m_colourMap.AddGradientPoint( 0.1250, utils::Color( 79, 106,   53, 255)); // grass
+        m_colourMap.AddGradientPoint( 0.3750, utils::Color(157, 127,   75, 255)); // dirt
+        m_colourMap.AddGradientPoint( 0.7500, utils::Color(143, 135, 124, 255)); // rock
+        m_colourMap.AddGradientPoint( 1.0000, utils::Color(255, 255, 255, 255)); // snow
+        m_colourMap.EnableLight();
+        m_colourMap.SetLightContrast(5.0);
+        m_colourMap.SetLightBrightness(2.0);
+        m_colourMap.Render();
 
-        utils::WriterBMP writerColour;
-        writerColour.SetSourceImage(imageColour);
-        writerColour.SetDestFilename("textures/myPerlinColourmap.bmp");
-        writerColour.WriteDestFile();
+        m_writerColour.SetSourceImage(m_imageColour);
+        m_writerColour.SetDestFilename("textures/myPerlinColourmap.bmp");
+        m_writerColour.WriteDestFile();
 
         delete m_colourTex;
 
@@ -246,7 +231,6 @@ void GeometryClipmap::update(){
 
     GLuint mapPosLoc = m_shaderProgram->getUniformLoc("map_position");
     glUniform4f(mapPosLoc, -m_viewPos.x/float(2*512*m_gridSize), 0, -m_viewPos.z/float(2*512*m_gridSize), 0);
-    //std::cout<<"map_pos x: "<<-m_viewPos.x/float(2*512*m_gridSize)<<", z: "<<-m_viewPos.z/float(2*512*m_gridSize)<<std::endl;
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_heightmapTex->getTextureID());
@@ -288,9 +272,12 @@ void GeometryClipmap::update(){
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::loadMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix){
     m_shaderProgram->use();
+    GLuint normalMatrixLoc = m_shaderProgram->getUniformLoc("normalMatrix");
     glm::mat4 modelViewMatrix = _viewMatrix * _modelMatrix;
+    glm::mat4 normalMatrix = glm::inverseTranspose(modelViewMatrix);
     glm::mat4 modelViewProjectionMatrix = _projectionMatrix * _viewMatrix * _modelMatrix;
     glUniformMatrix4fv(m_modelViewLoc, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
+    glUniformMatrix4fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
     glUniformMatrix4fv(m_modelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
 }
 
@@ -307,9 +294,7 @@ void GeometryClipmap::render(){
         glUniform4f(scaleLoc, scale.x, scale.y, scale.z, 1.0);
 
         for (int k=-2; k<2; ++k) {
-        //int k =1;
             for (int j=-2; j<2; ++j){
-                //int j=1;
                 // Set texture for heightmap
                 glUniform1i(m_geoTextureLoc, 0);
 
@@ -338,10 +323,3 @@ void GeometryClipmap::render(){
     }
 }
 
-void GeometryClipmap::moveCamera(glm::vec3 _direction){
-    //m_viewPos += _direction;
-    //m_xvalue += _direction.x/5.0;
-    //std::cout<<"x: "<<_direction.x<<std::endl;
-    //m_zvalue -= float(_direction.z/8192.0);
-    //std::cout<<"z: "<<_direction.z<<std::endl;
-}

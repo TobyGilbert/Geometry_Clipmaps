@@ -23,7 +23,7 @@ void main(){
    height = pos.y/3.0;
    pos.y*=heightScale;
    texCoords = pos_map.xz;
-   position =  pos;
+   position =  vec4(pos.x, 1.0, pos.z, pos.w);
    vertPos = pos.xz;
    gl_Position = MVP * pos;
 }

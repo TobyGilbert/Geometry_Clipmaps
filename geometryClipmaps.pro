@@ -28,7 +28,9 @@ SOURCES += \
     src/Skybox.cpp \
     src/Trees.cpp \
     src/noiseutils.cpp \
-    src/grasshair.cpp
+    src/grasshair.cpp \
+    src/Water.cpp \
+    src/MesoTerrain.cpp
 
 
 HEADERS += \
@@ -46,7 +48,9 @@ HEADERS += \
     include/Skybox.h \
     include/Trees.h \
     include/noiseutils.h \
-    include/grasshair.h
+    include/grasshair.h \
+    include/Water.h \
+    include/MesoTerrain.h
 
 INCLUDEPATH +=./include /opt/local/include /usr/local/include
 LIBS += -L/opt/local/lib -lIL -lassimp -L/usr/local/lib -lnoise
@@ -84,7 +88,6 @@ OTHER_FILES += \
     shaders/geometryClipmapsVert.glsl \
     shaders/geometryClipmapsFrag.glsl \
     textures/grassTexture.jpg \
-    textures/fractal_heightmap.png \
     textures/rockTexture.jpg \
     textures/mudTexture.png \
     textures/snowTexture.png \
@@ -92,28 +95,25 @@ OTHER_FILES += \
     shaders/skyboxVert.glsl \
     textures/skyCubeMap_negx.png \
     textures/skyCubeMap_posx.png \
-    textures/HeightMap_1.jpg \
     textures/skyCubeMap_negz.png \
     textures/skyCubeMap_negy.png \
     textures/skyCubeMap_posy.png \
     textures/skyCubeMap_posz.png \
-    textures/seamlessHeightmap.png \
-    textures/seamlessHeightmap.jpg \
     shaders/TreeFrag.glsl \
     shaders/TreeVert.glsl \
     styleSheet/darkOrange \
-    textures/fractal_heightmap1.png \
-    textures/fractal_heightmap2.png \
-    textures/fractal_heightmap3.png \
-    textures/fractal_heightmap4.png \
     textures/Bioshock.jpg \
     textures/blue.png \
     textures/green.png \
     textures/red.png \
     textures/yellow.png \
-    textures/result2.png \
     shaders/grassHairVert.glsl\
     shaders/grassHairFrag.glsl \
     shaders/grassHairGeom.glsl \
-    textures/t.png
+    shaders/elevatedFrag.glsl \
+    models/water.obj \
+    shaders/waterVert.glsl \
+    shaders/waterFrag.glsl \
+    models/mesoTerrain.obj \
+    textures/declanHeightmap.jpg
 

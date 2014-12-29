@@ -60,7 +60,9 @@ SOURCES       = src/main.cpp \
 		src/Skybox.cpp \
 		src/Trees.cpp \
 		src/noiseutils.cpp \
-		src/grasshair.cpp moc/moc_mainwindow.cpp \
+		src/grasshair.cpp \
+		src/Water.cpp \
+		src/MesoTerrain.cpp moc/moc_mainwindow.cpp \
 		moc/moc_OpenGLWidget.cpp
 OBJECTS       = obj/main.o \
 		obj/mainwindow.o \
@@ -78,6 +80,8 @@ OBJECTS       = obj/main.o \
 		obj/Trees.o \
 		obj/noiseutils.o \
 		obj/grasshair.o \
+		obj/Water.o \
+		obj/MesoTerrain.o \
 		obj/moc_mainwindow.o \
 		obj/moc_OpenGLWidget.o
 DIST          = /Users/Toby/Qt5.2.1/5.2.1/clang_64/mkspecs/features/spec_pre.prf \
@@ -476,7 +480,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d obj/Geometry_Clipmaps1.0.0 || mkdir -p obj/Geometry_Clipmaps1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents include/mainwindow.h include/Camera.h include/ShaderUtils.h include/TextureUtils.h include/ShaderProgram.h include/Texture.h include/Model.h include/OpenGLWidget.h include/Shader.h include/Bmp.h include/GeometryClipmap.h include/Skybox.h include/Trees.h include/noiseutils.h include/grasshair.h obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/Camera.cpp src/ShaderUtils.cpp src/TextureUtils.cpp src/ShaderProgram.cpp src/Texture.cpp src/Model.cpp src/OpenGLWidget.cpp src/Shader.cpp src/Bmp.cpp src/GeometryClipmap.cpp src/Skybox.cpp src/Trees.cpp src/noiseutils.cpp src/grasshair.cpp obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents ui/mainwindow.ui obj/Geometry_Clipmaps1.0.0/ && (cd `dirname obj/Geometry_Clipmaps1.0.0` && $(TAR) Geometry_Clipmaps1.0.0.tar Geometry_Clipmaps1.0.0 && $(COMPRESS) Geometry_Clipmaps1.0.0.tar) && $(MOVE) `dirname obj/Geometry_Clipmaps1.0.0`/Geometry_Clipmaps1.0.0.tar.gz . && $(DEL_FILE) -r obj/Geometry_Clipmaps1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents include/mainwindow.h include/Camera.h include/ShaderUtils.h include/TextureUtils.h include/ShaderProgram.h include/Texture.h include/Model.h include/OpenGLWidget.h include/Shader.h include/Bmp.h include/GeometryClipmap.h include/Skybox.h include/Trees.h include/noiseutils.h include/grasshair.h include/Water.h include/MesoTerrain.h obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/Camera.cpp src/ShaderUtils.cpp src/TextureUtils.cpp src/ShaderProgram.cpp src/Texture.cpp src/Model.cpp src/OpenGLWidget.cpp src/Shader.cpp src/Bmp.cpp src/GeometryClipmap.cpp src/Skybox.cpp src/Trees.cpp src/noiseutils.cpp src/grasshair.cpp src/Water.cpp src/MesoTerrain.cpp obj/Geometry_Clipmaps1.0.0/ && $(COPY_FILE) --parents ui/mainwindow.ui obj/Geometry_Clipmaps1.0.0/ && (cd `dirname obj/Geometry_Clipmaps1.0.0` && $(TAR) Geometry_Clipmaps1.0.0.tar Geometry_Clipmaps1.0.0 && $(COMPRESS) Geometry_Clipmaps1.0.0.tar) && $(MOVE) `dirname obj/Geometry_Clipmaps1.0.0`/Geometry_Clipmaps1.0.0.tar.gz . && $(DEL_FILE) -r obj/Geometry_Clipmaps1.0.0
 
 
 clean:compiler_clean 
@@ -613,8 +617,51 @@ moc/moc_mainwindow.cpp: /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framewo
 		include/Texture.h \
 		include/Bmp.h \
 		include/GeometryClipmap.h \
+		/usr/local/include/noise/noise.h \
+		/usr/local/include/noise/module/module.h \
+		/usr/local/include/noise/module/add.h \
+		/usr/local/include/noise/module/modulebase.h \
+		/usr/local/include/noise/basictypes.h \
+		/usr/local/include/noise/exception.h \
+		/usr/local/include/noise/noisegen.h \
+		/usr/local/include/noise/module/abs.h \
+		/usr/local/include/noise/module/billow.h \
+		/usr/local/include/noise/module/blend.h \
+		/usr/local/include/noise/module/cache.h \
+		/usr/local/include/noise/module/checkerboard.h \
+		/usr/local/include/noise/module/clamp.h \
+		/usr/local/include/noise/module/const.h \
+		/usr/local/include/noise/module/curve.h \
+		/usr/local/include/noise/module/cylinders.h \
+		/usr/local/include/noise/module/displace.h \
+		/usr/local/include/noise/module/exponent.h \
+		/usr/local/include/noise/module/invert.h \
+		/usr/local/include/noise/module/max.h \
+		/usr/local/include/noise/module/min.h \
+		/usr/local/include/noise/module/multiply.h \
+		/usr/local/include/noise/module/perlin.h \
+		/usr/local/include/noise/module/power.h \
+		/usr/local/include/noise/module/ridgedmulti.h \
+		/usr/local/include/noise/module/rotatepoint.h \
+		/usr/local/include/noise/module/scalebias.h \
+		/usr/local/include/noise/module/scalepoint.h \
+		/usr/local/include/noise/module/select.h \
+		/usr/local/include/noise/module/spheres.h \
+		/usr/local/include/noise/module/terrace.h \
+		/usr/local/include/noise/module/translatepoint.h \
+		/usr/local/include/noise/module/turbulence.h \
+		/usr/local/include/noise/module/voronoi.h \
+		/usr/local/include/noise/model/model.h \
+		/usr/local/include/noise/model/cylinder.h \
+		/usr/local/include/noise/model/line.h \
+		/usr/local/include/noise/model/plane.h \
+		/usr/local/include/noise/model/sphere.h \
+		/usr/local/include/noise/misc.h \
+		include/noiseutils.h \
 		include/Skybox.h \
 		include/grasshair.h \
+		include/Water.h \
+		include/MesoTerrain.h \
 		include/mainwindow.h
 	/Users/Toby/Qt5.2.1/5.2.1/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 $(INCPATH) include/mainwindow.h -o moc/moc_mainwindow.cpp
 
@@ -724,8 +771,51 @@ moc/moc_OpenGLWidget.cpp: /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framew
 		include/Texture.h \
 		include/Bmp.h \
 		include/GeometryClipmap.h \
+		/usr/local/include/noise/noise.h \
+		/usr/local/include/noise/module/module.h \
+		/usr/local/include/noise/module/add.h \
+		/usr/local/include/noise/module/modulebase.h \
+		/usr/local/include/noise/basictypes.h \
+		/usr/local/include/noise/exception.h \
+		/usr/local/include/noise/noisegen.h \
+		/usr/local/include/noise/module/abs.h \
+		/usr/local/include/noise/module/billow.h \
+		/usr/local/include/noise/module/blend.h \
+		/usr/local/include/noise/module/cache.h \
+		/usr/local/include/noise/module/checkerboard.h \
+		/usr/local/include/noise/module/clamp.h \
+		/usr/local/include/noise/module/const.h \
+		/usr/local/include/noise/module/curve.h \
+		/usr/local/include/noise/module/cylinders.h \
+		/usr/local/include/noise/module/displace.h \
+		/usr/local/include/noise/module/exponent.h \
+		/usr/local/include/noise/module/invert.h \
+		/usr/local/include/noise/module/max.h \
+		/usr/local/include/noise/module/min.h \
+		/usr/local/include/noise/module/multiply.h \
+		/usr/local/include/noise/module/perlin.h \
+		/usr/local/include/noise/module/power.h \
+		/usr/local/include/noise/module/ridgedmulti.h \
+		/usr/local/include/noise/module/rotatepoint.h \
+		/usr/local/include/noise/module/scalebias.h \
+		/usr/local/include/noise/module/scalepoint.h \
+		/usr/local/include/noise/module/select.h \
+		/usr/local/include/noise/module/spheres.h \
+		/usr/local/include/noise/module/terrace.h \
+		/usr/local/include/noise/module/translatepoint.h \
+		/usr/local/include/noise/module/turbulence.h \
+		/usr/local/include/noise/module/voronoi.h \
+		/usr/local/include/noise/model/model.h \
+		/usr/local/include/noise/model/cylinder.h \
+		/usr/local/include/noise/model/line.h \
+		/usr/local/include/noise/model/plane.h \
+		/usr/local/include/noise/model/sphere.h \
+		/usr/local/include/noise/misc.h \
+		include/noiseutils.h \
 		include/Skybox.h \
 		include/grasshair.h \
+		include/Water.h \
+		include/MesoTerrain.h \
 		include/OpenGLWidget.h
 	/Users/Toby/Qt5.2.1/5.2.1/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 $(INCPATH) include/OpenGLWidget.h -o moc/moc_OpenGLWidget.cpp
 
@@ -861,8 +951,51 @@ obj/main.o: src/main.cpp /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framew
 		include/Texture.h \
 		include/Bmp.h \
 		include/GeometryClipmap.h \
+		/usr/local/include/noise/noise.h \
+		/usr/local/include/noise/module/module.h \
+		/usr/local/include/noise/module/add.h \
+		/usr/local/include/noise/module/modulebase.h \
+		/usr/local/include/noise/basictypes.h \
+		/usr/local/include/noise/exception.h \
+		/usr/local/include/noise/noisegen.h \
+		/usr/local/include/noise/module/abs.h \
+		/usr/local/include/noise/module/billow.h \
+		/usr/local/include/noise/module/blend.h \
+		/usr/local/include/noise/module/cache.h \
+		/usr/local/include/noise/module/checkerboard.h \
+		/usr/local/include/noise/module/clamp.h \
+		/usr/local/include/noise/module/const.h \
+		/usr/local/include/noise/module/curve.h \
+		/usr/local/include/noise/module/cylinders.h \
+		/usr/local/include/noise/module/displace.h \
+		/usr/local/include/noise/module/exponent.h \
+		/usr/local/include/noise/module/invert.h \
+		/usr/local/include/noise/module/max.h \
+		/usr/local/include/noise/module/min.h \
+		/usr/local/include/noise/module/multiply.h \
+		/usr/local/include/noise/module/perlin.h \
+		/usr/local/include/noise/module/power.h \
+		/usr/local/include/noise/module/ridgedmulti.h \
+		/usr/local/include/noise/module/rotatepoint.h \
+		/usr/local/include/noise/module/scalebias.h \
+		/usr/local/include/noise/module/scalepoint.h \
+		/usr/local/include/noise/module/select.h \
+		/usr/local/include/noise/module/spheres.h \
+		/usr/local/include/noise/module/terrace.h \
+		/usr/local/include/noise/module/translatepoint.h \
+		/usr/local/include/noise/module/turbulence.h \
+		/usr/local/include/noise/module/voronoi.h \
+		/usr/local/include/noise/model/model.h \
+		/usr/local/include/noise/model/cylinder.h \
+		/usr/local/include/noise/model/line.h \
+		/usr/local/include/noise/model/plane.h \
+		/usr/local/include/noise/model/sphere.h \
+		/usr/local/include/noise/misc.h \
+		include/noiseutils.h \
 		include/Skybox.h \
 		include/grasshair.h \
+		include/Water.h \
+		include/MesoTerrain.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QFile \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qfile.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o src/main.cpp
@@ -977,8 +1110,51 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		include/Texture.h \
 		include/Bmp.h \
 		include/GeometryClipmap.h \
+		/usr/local/include/noise/noise.h \
+		/usr/local/include/noise/module/module.h \
+		/usr/local/include/noise/module/add.h \
+		/usr/local/include/noise/module/modulebase.h \
+		/usr/local/include/noise/basictypes.h \
+		/usr/local/include/noise/exception.h \
+		/usr/local/include/noise/noisegen.h \
+		/usr/local/include/noise/module/abs.h \
+		/usr/local/include/noise/module/billow.h \
+		/usr/local/include/noise/module/blend.h \
+		/usr/local/include/noise/module/cache.h \
+		/usr/local/include/noise/module/checkerboard.h \
+		/usr/local/include/noise/module/clamp.h \
+		/usr/local/include/noise/module/const.h \
+		/usr/local/include/noise/module/curve.h \
+		/usr/local/include/noise/module/cylinders.h \
+		/usr/local/include/noise/module/displace.h \
+		/usr/local/include/noise/module/exponent.h \
+		/usr/local/include/noise/module/invert.h \
+		/usr/local/include/noise/module/max.h \
+		/usr/local/include/noise/module/min.h \
+		/usr/local/include/noise/module/multiply.h \
+		/usr/local/include/noise/module/perlin.h \
+		/usr/local/include/noise/module/power.h \
+		/usr/local/include/noise/module/ridgedmulti.h \
+		/usr/local/include/noise/module/rotatepoint.h \
+		/usr/local/include/noise/module/scalebias.h \
+		/usr/local/include/noise/module/scalepoint.h \
+		/usr/local/include/noise/module/select.h \
+		/usr/local/include/noise/module/spheres.h \
+		/usr/local/include/noise/module/terrace.h \
+		/usr/local/include/noise/module/translatepoint.h \
+		/usr/local/include/noise/module/turbulence.h \
+		/usr/local/include/noise/module/voronoi.h \
+		/usr/local/include/noise/model/model.h \
+		/usr/local/include/noise/model/cylinder.h \
+		/usr/local/include/noise/model/line.h \
+		/usr/local/include/noise/model/plane.h \
+		/usr/local/include/noise/model/sphere.h \
+		/usr/local/include/noise/misc.h \
+		include/noiseutils.h \
 		include/Skybox.h \
 		include/grasshair.h \
+		include/Water.h \
+		include/MesoTerrain.h \
 		ui_mainwindow.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framework/Versions/5/Headers/QFileDialog \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framework/Versions/5/Headers/qfiledialog.h
@@ -1479,8 +1655,51 @@ obj/OpenGLWidget.o: src/OpenGLWidget.cpp /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/
 		include/Texture.h \
 		include/Bmp.h \
 		include/GeometryClipmap.h \
+		/usr/local/include/noise/noise.h \
+		/usr/local/include/noise/module/module.h \
+		/usr/local/include/noise/module/add.h \
+		/usr/local/include/noise/module/modulebase.h \
+		/usr/local/include/noise/basictypes.h \
+		/usr/local/include/noise/exception.h \
+		/usr/local/include/noise/noisegen.h \
+		/usr/local/include/noise/module/abs.h \
+		/usr/local/include/noise/module/billow.h \
+		/usr/local/include/noise/module/blend.h \
+		/usr/local/include/noise/module/cache.h \
+		/usr/local/include/noise/module/checkerboard.h \
+		/usr/local/include/noise/module/clamp.h \
+		/usr/local/include/noise/module/const.h \
+		/usr/local/include/noise/module/curve.h \
+		/usr/local/include/noise/module/cylinders.h \
+		/usr/local/include/noise/module/displace.h \
+		/usr/local/include/noise/module/exponent.h \
+		/usr/local/include/noise/module/invert.h \
+		/usr/local/include/noise/module/max.h \
+		/usr/local/include/noise/module/min.h \
+		/usr/local/include/noise/module/multiply.h \
+		/usr/local/include/noise/module/perlin.h \
+		/usr/local/include/noise/module/power.h \
+		/usr/local/include/noise/module/ridgedmulti.h \
+		/usr/local/include/noise/module/rotatepoint.h \
+		/usr/local/include/noise/module/scalebias.h \
+		/usr/local/include/noise/module/scalepoint.h \
+		/usr/local/include/noise/module/select.h \
+		/usr/local/include/noise/module/spheres.h \
+		/usr/local/include/noise/module/terrace.h \
+		/usr/local/include/noise/module/translatepoint.h \
+		/usr/local/include/noise/module/turbulence.h \
+		/usr/local/include/noise/module/voronoi.h \
+		/usr/local/include/noise/model/model.h \
+		/usr/local/include/noise/model/cylinder.h \
+		/usr/local/include/noise/model/line.h \
+		/usr/local/include/noise/model/plane.h \
+		/usr/local/include/noise/model/sphere.h \
+		/usr/local/include/noise/misc.h \
+		include/noiseutils.h \
 		include/Skybox.h \
 		include/grasshair.h \
+		include/Water.h \
+		include/MesoTerrain.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QCursor \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qcursor.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/OpenGLWidget.o src/OpenGLWidget.cpp
@@ -1728,26 +1947,6 @@ obj/GeometryClipmap.o: src/GeometryClipmap.cpp include/GeometryClipmap.h \
 		/opt/local/include/glm/integer.hpp \
 		/opt/local/include/glm/detail/func_integer.hpp \
 		/opt/local/include/glm/detail/func_integer.inl \
-		include/ShaderProgram.h \
-		/opt/local/include/GLFW/glfw3.h \
-		/opt/local/include/GL/gl.h \
-		/opt/local/include/GL/gl_mangle.h \
-		/opt/local/include/GL/glext.h \
-		/opt/local/include/GL/glu.h \
-		/opt/local/include/GL/glu_mangle.h \
-		/opt/local/include/IL/il.h \
-		include/Shader.h \
-		/opt/local/include/glm/gtc/type_ptr.hpp \
-		/opt/local/include/glm/gtc/quaternion.hpp \
-		/opt/local/include/glm/gtc/constants.hpp \
-		/opt/local/include/glm/gtc/constants.inl \
-		/opt/local/include/glm/gtc/quaternion.inl \
-		/opt/local/include/glm/gtc/type_ptr.inl \
-		include/Texture.h \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QImage \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qimage.h \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/QGLWidget \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/qgl.h \
 		/usr/local/include/noise/noise.h \
 		/usr/local/include/noise/module/module.h \
 		/usr/local/include/noise/module/add.h \
@@ -1789,6 +1988,28 @@ obj/GeometryClipmap.o: src/GeometryClipmap.cpp include/GeometryClipmap.h \
 		/usr/local/include/noise/model/sphere.h \
 		/usr/local/include/noise/misc.h \
 		include/noiseutils.h \
+		include/ShaderProgram.h \
+		/opt/local/include/GLFW/glfw3.h \
+		/opt/local/include/GL/gl.h \
+		/opt/local/include/GL/gl_mangle.h \
+		/opt/local/include/GL/glext.h \
+		/opt/local/include/GL/glu.h \
+		/opt/local/include/GL/glu_mangle.h \
+		/opt/local/include/IL/il.h \
+		include/Shader.h \
+		/opt/local/include/glm/gtc/type_ptr.hpp \
+		/opt/local/include/glm/gtc/quaternion.hpp \
+		/opt/local/include/glm/gtc/constants.hpp \
+		/opt/local/include/glm/gtc/constants.inl \
+		/opt/local/include/glm/gtc/quaternion.inl \
+		/opt/local/include/glm/gtc/type_ptr.inl \
+		include/Texture.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QImage \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qimage.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/QGLWidget \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/qgl.h \
+		/opt/local/include/glm/gtc/matrix_inverse.hpp \
+		/opt/local/include/glm/gtc/matrix_inverse.inl \
 		include/Bmp.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/GeometryClipmap.o src/GeometryClipmap.cpp
 
@@ -1886,7 +2107,9 @@ obj/Skybox.o: src/Skybox.cpp include/Skybox.h \
 		include/Shader.h \
 		include/Model.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/QGLWidget \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/qgl.h
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/qgl.h \
+		/opt/local/include/glm/gtc/matrix_inverse.hpp \
+		/opt/local/include/glm/gtc/matrix_inverse.inl
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Skybox.o src/Skybox.cpp
 
 obj/Trees.o: src/Trees.cpp include/Trees.h \
@@ -2134,6 +2357,198 @@ obj/grasshair.o: src/grasshair.cpp include/grasshair.h \
 		/opt/local/include/glm/gtc/quaternion.inl \
 		/opt/local/include/glm/gtc/type_ptr.inl
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/grasshair.o src/grasshair.cpp
+
+obj/Water.o: src/Water.cpp include/Water.h \
+		/opt/local/include/glm/glm.hpp \
+		/opt/local/include/glm/detail/_fixes.hpp \
+		/opt/local/include/glm/fwd.hpp \
+		/opt/local/include/glm/detail/type_int.hpp \
+		/opt/local/include/glm/detail/setup.hpp \
+		/opt/local/include/glm/detail/type_float.hpp \
+		/opt/local/include/glm/detail/type_vec.hpp \
+		/opt/local/include/glm/detail/precision.hpp \
+		/opt/local/include/glm/detail/type_mat.hpp \
+		/opt/local/include/glm/vec2.hpp \
+		/opt/local/include/glm/detail/type_vec2.hpp \
+		/opt/local/include/glm/detail/_swizzle.hpp \
+		/opt/local/include/glm/detail/_swizzle_func.hpp \
+		/opt/local/include/glm/detail/type_vec2.inl \
+		/opt/local/include/glm/vec3.hpp \
+		/opt/local/include/glm/detail/type_vec3.hpp \
+		/opt/local/include/glm/detail/type_vec3.inl \
+		/opt/local/include/glm/vec4.hpp \
+		/opt/local/include/glm/detail/type_vec4.hpp \
+		/opt/local/include/glm/detail/type_vec4.inl \
+		/opt/local/include/glm/mat2x2.hpp \
+		/opt/local/include/glm/detail/type_mat2x2.hpp \
+		/opt/local/include/glm/detail/type_mat2x2.inl \
+		/opt/local/include/glm/mat2x3.hpp \
+		/opt/local/include/glm/detail/type_mat2x3.hpp \
+		/opt/local/include/glm/detail/type_mat2x3.inl \
+		/opt/local/include/glm/mat2x4.hpp \
+		/opt/local/include/glm/detail/type_mat2x4.hpp \
+		/opt/local/include/glm/detail/type_mat2x4.inl \
+		/opt/local/include/glm/mat3x2.hpp \
+		/opt/local/include/glm/detail/type_mat3x2.hpp \
+		/opt/local/include/glm/detail/type_mat3x2.inl \
+		/opt/local/include/glm/mat3x3.hpp \
+		/opt/local/include/glm/detail/type_mat3x3.hpp \
+		/opt/local/include/glm/detail/type_mat3x3.inl \
+		/opt/local/include/glm/mat3x4.hpp \
+		/opt/local/include/glm/detail/type_mat3x4.hpp \
+		/opt/local/include/glm/detail/type_mat3x4.inl \
+		/opt/local/include/glm/mat4x2.hpp \
+		/opt/local/include/glm/detail/type_mat4x2.hpp \
+		/opt/local/include/glm/detail/type_mat4x2.inl \
+		/opt/local/include/glm/mat4x3.hpp \
+		/opt/local/include/glm/detail/type_mat4x3.hpp \
+		/opt/local/include/glm/detail/type_mat4x3.inl \
+		/opt/local/include/glm/mat4x4.hpp \
+		/opt/local/include/glm/detail/type_mat4x4.hpp \
+		/opt/local/include/glm/detail/type_mat4x4.inl \
+		/opt/local/include/glm/trigonometric.hpp \
+		/opt/local/include/glm/detail/func_trigonometric.hpp \
+		/opt/local/include/glm/detail/func_trigonometric.inl \
+		/opt/local/include/glm/detail/_vectorize.hpp \
+		/opt/local/include/glm/detail/type_vec1.hpp \
+		/opt/local/include/glm/detail/type_vec1.inl \
+		/opt/local/include/glm/exponential.hpp \
+		/opt/local/include/glm/detail/func_exponential.hpp \
+		/opt/local/include/glm/detail/func_exponential.inl \
+		/opt/local/include/glm/detail/func_vector_relational.hpp \
+		/opt/local/include/glm/detail/func_vector_relational.inl \
+		/opt/local/include/glm/common.hpp \
+		/opt/local/include/glm/detail/func_common.hpp \
+		/opt/local/include/glm/detail/func_common.inl \
+		/opt/local/include/glm/packing.hpp \
+		/opt/local/include/glm/detail/func_packing.hpp \
+		/opt/local/include/glm/detail/func_packing.inl \
+		/opt/local/include/glm/detail/type_half.hpp \
+		/opt/local/include/glm/detail/type_half.inl \
+		/opt/local/include/glm/geometric.hpp \
+		/opt/local/include/glm/detail/func_geometric.hpp \
+		/opt/local/include/glm/detail/func_geometric.inl \
+		/opt/local/include/glm/matrix.hpp \
+		/opt/local/include/glm/detail/func_matrix.hpp \
+		/opt/local/include/glm/detail/func_matrix.inl \
+		/opt/local/include/glm/vector_relational.hpp \
+		/opt/local/include/glm/integer.hpp \
+		/opt/local/include/glm/detail/func_integer.hpp \
+		/opt/local/include/glm/detail/func_integer.inl \
+		include/Model.h \
+		include/ShaderProgram.h \
+		/opt/local/include/GLFW/glfw3.h \
+		/opt/local/include/GL/gl.h \
+		/opt/local/include/GL/gl_mangle.h \
+		/opt/local/include/GL/glext.h \
+		/opt/local/include/GL/glu.h \
+		/opt/local/include/GL/glu_mangle.h \
+		/opt/local/include/IL/il.h \
+		include/Shader.h \
+		/opt/local/include/glm/gtc/type_ptr.hpp \
+		/opt/local/include/glm/gtc/quaternion.hpp \
+		/opt/local/include/glm/gtc/constants.hpp \
+		/opt/local/include/glm/gtc/constants.inl \
+		/opt/local/include/glm/gtc/quaternion.inl \
+		/opt/local/include/glm/gtc/type_ptr.inl
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Water.o src/Water.cpp
+
+obj/MesoTerrain.o: src/MesoTerrain.cpp include/MesoTerrain.h \
+		/opt/local/include/glm/glm.hpp \
+		/opt/local/include/glm/detail/_fixes.hpp \
+		/opt/local/include/glm/fwd.hpp \
+		/opt/local/include/glm/detail/type_int.hpp \
+		/opt/local/include/glm/detail/setup.hpp \
+		/opt/local/include/glm/detail/type_float.hpp \
+		/opt/local/include/glm/detail/type_vec.hpp \
+		/opt/local/include/glm/detail/precision.hpp \
+		/opt/local/include/glm/detail/type_mat.hpp \
+		/opt/local/include/glm/vec2.hpp \
+		/opt/local/include/glm/detail/type_vec2.hpp \
+		/opt/local/include/glm/detail/_swizzle.hpp \
+		/opt/local/include/glm/detail/_swizzle_func.hpp \
+		/opt/local/include/glm/detail/type_vec2.inl \
+		/opt/local/include/glm/vec3.hpp \
+		/opt/local/include/glm/detail/type_vec3.hpp \
+		/opt/local/include/glm/detail/type_vec3.inl \
+		/opt/local/include/glm/vec4.hpp \
+		/opt/local/include/glm/detail/type_vec4.hpp \
+		/opt/local/include/glm/detail/type_vec4.inl \
+		/opt/local/include/glm/mat2x2.hpp \
+		/opt/local/include/glm/detail/type_mat2x2.hpp \
+		/opt/local/include/glm/detail/type_mat2x2.inl \
+		/opt/local/include/glm/mat2x3.hpp \
+		/opt/local/include/glm/detail/type_mat2x3.hpp \
+		/opt/local/include/glm/detail/type_mat2x3.inl \
+		/opt/local/include/glm/mat2x4.hpp \
+		/opt/local/include/glm/detail/type_mat2x4.hpp \
+		/opt/local/include/glm/detail/type_mat2x4.inl \
+		/opt/local/include/glm/mat3x2.hpp \
+		/opt/local/include/glm/detail/type_mat3x2.hpp \
+		/opt/local/include/glm/detail/type_mat3x2.inl \
+		/opt/local/include/glm/mat3x3.hpp \
+		/opt/local/include/glm/detail/type_mat3x3.hpp \
+		/opt/local/include/glm/detail/type_mat3x3.inl \
+		/opt/local/include/glm/mat3x4.hpp \
+		/opt/local/include/glm/detail/type_mat3x4.hpp \
+		/opt/local/include/glm/detail/type_mat3x4.inl \
+		/opt/local/include/glm/mat4x2.hpp \
+		/opt/local/include/glm/detail/type_mat4x2.hpp \
+		/opt/local/include/glm/detail/type_mat4x2.inl \
+		/opt/local/include/glm/mat4x3.hpp \
+		/opt/local/include/glm/detail/type_mat4x3.hpp \
+		/opt/local/include/glm/detail/type_mat4x3.inl \
+		/opt/local/include/glm/mat4x4.hpp \
+		/opt/local/include/glm/detail/type_mat4x4.hpp \
+		/opt/local/include/glm/detail/type_mat4x4.inl \
+		/opt/local/include/glm/trigonometric.hpp \
+		/opt/local/include/glm/detail/func_trigonometric.hpp \
+		/opt/local/include/glm/detail/func_trigonometric.inl \
+		/opt/local/include/glm/detail/_vectorize.hpp \
+		/opt/local/include/glm/detail/type_vec1.hpp \
+		/opt/local/include/glm/detail/type_vec1.inl \
+		/opt/local/include/glm/exponential.hpp \
+		/opt/local/include/glm/detail/func_exponential.hpp \
+		/opt/local/include/glm/detail/func_exponential.inl \
+		/opt/local/include/glm/detail/func_vector_relational.hpp \
+		/opt/local/include/glm/detail/func_vector_relational.inl \
+		/opt/local/include/glm/common.hpp \
+		/opt/local/include/glm/detail/func_common.hpp \
+		/opt/local/include/glm/detail/func_common.inl \
+		/opt/local/include/glm/packing.hpp \
+		/opt/local/include/glm/detail/func_packing.hpp \
+		/opt/local/include/glm/detail/func_packing.inl \
+		/opt/local/include/glm/detail/type_half.hpp \
+		/opt/local/include/glm/detail/type_half.inl \
+		/opt/local/include/glm/geometric.hpp \
+		/opt/local/include/glm/detail/func_geometric.hpp \
+		/opt/local/include/glm/detail/func_geometric.inl \
+		/opt/local/include/glm/matrix.hpp \
+		/opt/local/include/glm/detail/func_matrix.hpp \
+		/opt/local/include/glm/detail/func_matrix.inl \
+		/opt/local/include/glm/vector_relational.hpp \
+		/opt/local/include/glm/integer.hpp \
+		/opt/local/include/glm/detail/func_integer.hpp \
+		/opt/local/include/glm/detail/func_integer.inl \
+		include/ShaderProgram.h \
+		/opt/local/include/GLFW/glfw3.h \
+		/opt/local/include/GL/gl.h \
+		/opt/local/include/GL/gl_mangle.h \
+		/opt/local/include/GL/glext.h \
+		/opt/local/include/GL/glu.h \
+		/opt/local/include/GL/glu_mangle.h \
+		/opt/local/include/IL/il.h \
+		include/Shader.h \
+		include/Model.h \
+		/opt/local/include/glm/gtc/matrix_inverse.hpp \
+		/opt/local/include/glm/gtc/matrix_inverse.inl \
+		/opt/local/include/glm/gtc/type_ptr.hpp \
+		/opt/local/include/glm/gtc/quaternion.hpp \
+		/opt/local/include/glm/gtc/constants.hpp \
+		/opt/local/include/glm/gtc/constants.inl \
+		/opt/local/include/glm/gtc/quaternion.inl \
+		/opt/local/include/glm/gtc/type_ptr.inl
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/MesoTerrain.o src/MesoTerrain.cpp
 
 obj/moc_mainwindow.o: moc/moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_mainwindow.o moc/moc_mainwindow.cpp

@@ -31,6 +31,8 @@ OpenGLWidget::~OpenGLWidget(){
     delete m_cam;
     delete m_geometryClipmap;
     delete m_sky;
+    delete m_water;
+    delete m_mesoTerrain;
 }
 //----------------------------------------------------------------------------------------------------------------------
 void OpenGLWidget::initializeGL(){
@@ -47,13 +49,19 @@ void OpenGLWidget::initializeGL(){
     glViewport(0,0,width(),height());
 
     // Initialize the camera
-    m_cam = new Camera(glm::vec3(0.0, 0.3, 0.10), width(), height(), glm::vec3(0.0, 1.0, 0.0));
+    m_cam = new Camera(glm::vec3(0.0, 10.0, 10.0), width(), height(), glm::vec3(0.0, 1.0, 0.0));
 
     // Create Geometry
     m_geometryClipmap = new GeometryClipmap(5);
 
+    // Create plane for water
+    m_water = new Water();
+
     //Create Skybox
     m_sky = new Skybox();
+
+    // Create meso level terrain
+    m_mesoTerrain = new MesoTerrain();
 
     startTimer(0);
 
@@ -89,28 +97,34 @@ void OpenGLWidget::paintGL(){
     m_mouseGlobalTX[3][1] = m_modelPos.y;
     m_mouseGlobalTX[3][2] = m_modelPos.z;
 
-    m_modelMatrix = glm::mat4(1.0);
     m_modelMatrix = m_mouseGlobalTX;
-    //m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.0, -10.0, 0.0));
-    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 1.0, 5.0));
-    //m_modelMatrix = glm::rotate(m_modelMatrix, m_viewAngle, glm::vec3(0.0, 1.0, 0.0));
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, 1.0, 10.0));
     m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
-
-    // Set if drawn in wireframe
     m_geometryClipmap->setWireframe(m_wireframe);
     m_geometryClipmap->setCutout(m_cutout);
     m_geometryClipmap->render();
 
-    m_modelMatrix = glm::mat4(1.0);
+    // Draw environment map
     m_modelMatrix = glm::rotate(m_modelMatrix, m_viewAngle, glm::vec3(0.0, 1.0, 0.0));
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(200.0, 200.0, 200.0));
     m_sky->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     m_sky->render();
 
-    m_modelMatrix = glm::mat4(1.0);
+    // Draw water plane
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
     m_modelMatrix = m_mouseGlobalTX;
-    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 1.0, 5.0));
+    m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.0, 1.5, 0.0));
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(80.0, 80.0, 80.0));
+    m_water->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
+    m_water->render();
+
+    glDisable(GL_BLEND);
+    m_modelMatrix = m_mouseGlobalTX;
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 5.0, 5.0));
+    m_mesoTerrain->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
+//    m_mesoTerrain->render();
 
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,26 +180,24 @@ void OpenGLWidget::mouseMoveEvent (QMouseEvent * _event)
 //----------------------------------------------------------------------------------------------------------------------
 void OpenGLWidget::keyPressEvent(QKeyEvent *_event){
 
-    float speed = 100.0;
     switch(_event->key()){
     case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
 
     //calculate our camera rotations
     case Qt::Key_W:
-        m_geometryClipmap->setUpdating(true);
+//        m_geometryClipmap->setUpdating(true);
         //m_geometryClipmap->moveCamera(glm::vec3(0.0, 0.0, -m_cameraSpeed));
-        //m_modelPos.z+=ZOOM;
     break;
     case Qt::Key_S:
-        m_geometryClipmap->setUpdating(true);
+//        m_geometryClipmap->setUpdating(true);
         //m_geometryClipmap->moveCamera(glm::vec3(0.0, 0.0, m_cameraSpeed));
     break;
     case Qt::Key_A:
-        m_geometryClipmap->setUpdating(true);
+//        m_geometryClipmap->setUpdating(true);
         //m_geometryClipmap->moveCamera(glm::vec3(-m_cameraSpeed, 0.0, 0.0));
     break;
     case Qt::Key_D:
-        m_geometryClipmap->setUpdating(true);
+//        m_geometryClipmap->setUpdating(true);
         //m_geometryClipmap->moveCamera(glm::vec3(m_cameraSpeed, 0.0, 0.0));
     break;
     case Qt::Key_4:
@@ -220,11 +232,13 @@ void OpenGLWidget::wheelEvent(QWheelEvent *_event){
 }
 
 void OpenGLWidget::keyReleaseEvent(QKeyEvent *_event){
-    m_cameraSpeed = 100.0;
-    m_geometryClipmap->setUpdating(false);
 }
 //---------------SLOTS----------------
 void OpenGLWidget::setHeight(int _height){
     m_geometryClipmap->setHeight(_height);
+}
+
+void OpenGLWidget::movingCamera(bool _moving){
+    m_geometryClipmap->setUpdating(_moving);
 }
 

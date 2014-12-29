@@ -1,8 +1,6 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-
-
 #include <QGLWidget>
 #include <QEvent>
 #include <QResizeEvent>
@@ -18,6 +16,8 @@
 #include "GeometryClipmap.h"
 #include "Skybox.h"
 #include "grasshair.h"
+#include "Water.h"
+#include "MesoTerrain.h"
 
 class OpenGLWidget : public QGLWidget
 {
@@ -60,7 +60,9 @@ public:
     void keyPressEvent(QKeyEvent *_event);
     //----------------------------------------------------------------------------------------------------------------------
     void keyReleaseEvent(QKeyEvent *_event);
+    // mouse press action
     void mousePressEvent(QMouseEvent *_event);
+    // scroll wheel action
     void wheelEvent(QWheelEvent *_event);
 
 private:
@@ -132,20 +134,19 @@ private:
     /// @brief skybox Object
     //----------------------------------------------------------------------------------------------------------------------
     Skybox *m_sky;
-
-    float m_mousePos;
-
-    GLfloat m_cameraSpeed;
-
+    // dictates whether terrain is drawn in wireframe
     bool m_wireframe;
-
+    // dictates whether cutout in terrain is drawn (can be removed)
     bool m_cutout;
-
-    grassHair *m_grass;
-
+    // Water object
+    Water *m_water;
+    // Meso terrain object (obj)
+    MesoTerrain *m_mesoTerrain;
 public slots:
+    // Scales the height of the terrain
     void setHeight(int _height);
-
+    // Sets the camera moving over the terrain
+    void movingCamera(bool _moving);
 };
 
 #endif // OPENGLWIDGET_H

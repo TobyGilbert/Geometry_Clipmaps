@@ -1,6 +1,7 @@
 #include "Skybox.h"
 
 #include <QGLWidget>
+#include <glm/gtc/matrix_inverse.hpp>
 
 Skybox::Skybox(){
     initSkybox();
@@ -121,9 +122,15 @@ void Skybox::update(){
 void Skybox::loadMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix){
     m_shaderProgram->use();
     GLuint MVPLoc = m_shaderProgram->getUniformLoc("modelViewProjectionMatrix");
+    GLuint modelViewMatrixLoc = m_shaderProgram->getUniformLoc("modelViewMatrix");
+    GLuint normaMatrixLoc = m_shaderProgram->getUniformLoc("normalMatrix");
 
+    glm::mat4 modelViewMatrix =  _viewMatrix * _modelMatrix;
+    glm::mat4 normalMatrix = glm::inverseTranspose(modelViewMatrix);
     glm::mat4 modelViewProjectionMatrix = _projectionMatrix * _viewMatrix * _modelMatrix;
 
+    glUniformMatrix4fv(modelViewMatrixLoc, 1, false, glm::value_ptr(modelViewMatrix));
+    glUniformMatrix4fv(normaMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
     glUniformMatrix4fv(MVPLoc, 1, false, glm::value_ptr(modelViewProjectionMatrix));
 }
 

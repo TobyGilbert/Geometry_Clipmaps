@@ -12,10 +12,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_openGLWidget = new OpenGLWidget(format,this);
     ui->gridLayout->addWidget(m_openGLWidget,0,0,1,1);
 
-    ui->horizontalSlider->setMinimum(1);
-    ui->horizontalSlider->setMaximum(10);
+    ui->horizontalSlider->setMinimum(20);
+    ui->horizontalSlider->setMaximum(30);
 
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), m_openGLWidget, SLOT(setHeight(int)));
+    connect(ui->checkBox, SIGNAL(clicked(bool)), m_openGLWidget, SLOT(movingCamera(bool)));
+
 }
 
 MainWindow::~MainWindow(){

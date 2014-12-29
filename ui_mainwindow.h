@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -36,6 +37,7 @@ public:
     QSlider *horizontalSlider;
     QLabel *label;
     QSpacerItem *verticalSpacer;
+    QCheckBox *checkBox;
     QSpacerItem *horizontalSpacer;
     QMenuBar *menubar;
     QStatusBar *statusbar;
@@ -72,7 +74,12 @@ public:
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout_2->addItem(verticalSpacer, 2, 0, 1, 1);
+        gridLayout_2->addItem(verticalSpacer, 3, 0, 1, 1);
+
+        checkBox = new QCheckBox(groupBox);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+
+        gridLayout_2->addWidget(checkBox, 2, 0, 1, 1);
 
 
         gridLayout->addWidget(groupBox, 0, 1, 1, 1);
@@ -98,8 +105,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        groupBox->setTitle(QApplication::translate("MainWindow", "GroupBox", 0));
+        groupBox->setTitle(QApplication::translate("MainWindow", "Controls", 0));
         label->setText(QApplication::translate("MainWindow", "Height", 0));
+        checkBox->setText(QApplication::translate("MainWindow", "Moving Camera", 0));
     } // retranslateUi
 
 };

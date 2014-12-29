@@ -10,6 +10,8 @@ int main(int argc, char **argv)
     File.open(QFile::ReadOnly);
     QString StyleSheet = QLatin1String(File.readAll());
 
+    w.setMinimumHeight(720);
+    w.setMinimumWidth(1280);
     w.setStyleSheet(StyleSheet);
     w.setWindowTitle(QString("Geometry Clipmaps"));
     w.show();
