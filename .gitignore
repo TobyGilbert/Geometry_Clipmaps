@@ -29,6 +29,7 @@
 
 #folders
 /videos
+/report
 
 #QT files
 *.pro.user

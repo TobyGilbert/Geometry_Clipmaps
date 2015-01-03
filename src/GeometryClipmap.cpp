@@ -8,7 +8,7 @@
 #include "Bmp.h"
 
 int width=1024,height=1024;
-float INCRIMENT = 0.01;
+float INCRIMENT = 0.1;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 GeometryClipmap::GeometryClipmap(int _levels): m_gridSize(32), m_wireframe(false), m_cutout(false), m_height(2.0), m_updating(false){
@@ -16,7 +16,6 @@ GeometryClipmap::GeometryClipmap(int _levels): m_gridSize(32), m_wireframe(false
     m_viewPos = glm::vec3(0.0, 0.0, 0.0);
     m_xvalue = 2;
     m_zvalue = 2;
-
     createShader();
     Initialise();
 }
@@ -30,6 +29,7 @@ GeometryClipmap::~GeometryClipmap(){
     delete m_mudTex;
     delete m_rockTex;
     delete m_snowTex;
+    delete m_sandTex;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::createShader(){
@@ -59,21 +59,35 @@ void GeometryClipmap::createShader(){
     GLuint fogMaxLoc = m_shaderProgram->getUniformLoc("fogMax");
 
     GLuint mudHeightLoc = m_shaderProgram->getUniformLoc("mudHeight");
+    GLuint sandHeightLoc = m_shaderProgram->getUniformLoc("sandHeight");
     GLuint grassHeightLoc = m_shaderProgram->getUniformLoc("grassHeight");
     GLuint rockHeightLoc = m_shaderProgram->getUniformLoc("rockHeight");
+    GLuint lightPosLoc = m_shaderProgram->getUniformLoc("light.position");
+    GLuint lightIntLoc = m_shaderProgram->getUniformLoc("light.intensity");
+    GLuint KdLoc = m_shaderProgram->getUniformLoc("Kd");
+    GLuint KaLoc = m_shaderProgram->getUniformLoc("Ka");
+    GLuint KsLoc = m_shaderProgram->getUniformLoc("Ks");
+    GLuint shininessLoc = m_shaderProgram->getUniformLoc("shininess");
 
-
-    glUniform1f(mudHeightLoc, 0.13);
-    glUniform1f(grassHeightLoc, 0.2);
-    glUniform1f(rockHeightLoc, 0.4);
-    glUniform1f(fogMinLoc, 3.0);
-    glUniform1f(fogMaxLoc, 4.0);
+    glUniform1f(mudHeightLoc, 0.28);
+    glUniform1f(sandHeightLoc, 0.31);
+    glUniform1f(grassHeightLoc, 0.4);
+    glUniform1f(rockHeightLoc, 0.6);
+    glUniform1f(fogMinLoc, 30.0);
+    glUniform1f(fogMaxLoc, 60.0);
+    glUniform4f(lightPosLoc, 0.0, 20.0, -0.0, 1.0);
+    glUniform3f(lightIntLoc, 1.0, 1.0, 1.0);
+    glUniform3f(KdLoc, 0.5, 0.5, 0.5);
+    glUniform3f(KaLoc, 0.5, 0.5, 0.5);
+    glUniform3f(KsLoc, 0.5, 0.5, 0.5);
+    glUniform1f(shininessLoc, 100.0);
 
     // driver info
     std::cout<<"GL_VERSION: "<<glGetString(GL_VERSION)<<std::endl;
     std::cout<<"GL_RENDERER: "<<glGetString(GL_RENDERER)<<std::endl;
     std::cout<<"GL_VENDOR: " <<glGetString(GL_VENDOR)<<std::endl;
     std::cout<<"GLU_VERSION: "<<gluGetString(GLU_VERSION)<<std::endl;
+
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::Initialise(){
@@ -81,7 +95,6 @@ void GeometryClipmap::Initialise(){
     m_heightmapBuilder.SetSourceModule(m_perlin);
     m_heightmapBuilder.SetDestNoiseMap(m_noisemap);
     m_heightmapBuilder.SetDestSize(1024, 1024);
-    //heightmapBuilder.SetBounds(m_xvalue, m_xvalue+4.0, m_zvalue, m_zvalue+4.0);
     m_heightmapBuilder.SetBounds(2.0, 6.0, 2.0, 6.0);
     m_heightmapBuilder.Build();
 
@@ -109,9 +122,9 @@ void GeometryClipmap::Initialise(){
     normalMapWriter.SetDestFilename("textures/myPerlinNormalMap.bmp");
     normalMapWriter.WriteDestFile();
 
-    m_normalmapTex = new Texture("textures/myPerlinNormalMap.bmp");
+//    m_normalmapTex = new Texture("textures/myPerlinNormalMap.bmp");
+    m_normalmapTex = new Texture("textures/normalMap.png");
 
-    //utils::RendererImage colourMap;
     m_colourMap.SetSourceNoiseMap(m_noisemap);
     m_colourMap.SetDestImage(m_imageColour);
     m_colourMap.ClearGradient();
@@ -123,9 +136,6 @@ void GeometryClipmap::Initialise(){
     m_colourMap.AddGradientPoint( 0.3750, utils::Color(157, 127,   75, 255)); // dirt
     m_colourMap.AddGradientPoint( 0.7500, utils::Color(143, 135, 124, 255)); // rock
     m_colourMap.AddGradientPoint( 1.0000, utils::Color(255, 255, 255, 255)); // snow
-    m_colourMap.EnableLight();
-    m_colourMap.SetLightContrast(5.0);
-    m_colourMap.SetLightBrightness(2.0);
     m_colourMap.Render();
 
     m_writerColour.SetSourceImage(m_imageColour);
@@ -147,6 +157,9 @@ void GeometryClipmap::Initialise(){
 
     // RockTexture
     m_rockTex = new Texture("textures/rockTexture.jpg");
+
+    // SandTexture
+    m_sandTex = new Texture("textures/sandTexture.jpg");
 
     //-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -170,6 +183,7 @@ void GeometryClipmap::Initialise(){
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*m_vert.size(), &m_vert[0].x, GL_DYNAMIC_DRAW);
+
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -232,6 +246,7 @@ void GeometryClipmap::update(){
     GLuint mapPosLoc = m_shaderProgram->getUniformLoc("map_position");
     glUniform4f(mapPosLoc, -m_viewPos.x/float(2*512*m_gridSize), 0, -m_viewPos.z/float(2*512*m_gridSize), 0);
 
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_heightmapTex->getTextureID());
     glActiveTexture(GL_TEXTURE1);
@@ -246,6 +261,8 @@ void GeometryClipmap::update(){
     glBindTexture(GL_TEXTURE_2D, m_normalmapTex->getTextureID());
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D, m_colourTex->getTextureID());
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, m_sandTex->getTextureID());
 
     m_geoTextureLoc = m_shaderProgram->getUniformLoc("geoTexture");
     glUniform1i(m_geoTextureLoc, 0);
@@ -268,14 +285,19 @@ void GeometryClipmap::update(){
     m_colourLoc = m_shaderProgram->getUniformLoc("colourMap");
     glUniform1i(m_colourLoc, 6);
 
+    GLuint sandLoc = m_shaderProgram->getUniformLoc("sandTexture");
+    glUniform1i(sandLoc, 7);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 void GeometryClipmap::loadMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix){
     m_shaderProgram->use();
     GLuint normalMatrixLoc = m_shaderProgram->getUniformLoc("normalMatrix");
+    GLuint modelMatrixLoc = m_shaderProgram->getUniformLoc("modelMatrix");
     glm::mat4 modelViewMatrix = _viewMatrix * _modelMatrix;
     glm::mat4 normalMatrix = glm::inverseTranspose(modelViewMatrix);
     glm::mat4 modelViewProjectionMatrix = _projectionMatrix * _viewMatrix * _modelMatrix;
+
+    glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(_modelMatrix));
     glUniformMatrix4fv(m_modelViewLoc, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
     glUniformMatrix4fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
     glUniformMatrix4fv(m_modelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
@@ -293,6 +315,7 @@ void GeometryClipmap::render(){
         GLuint scaleLoc = m_shaderProgram->getUniformLoc("scale");
         glUniform4f(scaleLoc, scale.x, scale.y, scale.z, 1.0);
 
+
         for (int k=-2; k<2; ++k) {
             for (int j=-2; j<2; ++j){
                 // Set texture for heightmap
@@ -307,6 +330,7 @@ void GeometryClipmap::render(){
                 // render
                 GLuint offsetLoc = m_shaderProgram->getUniformLoc("offset");
                 glUniform4f(offsetLoc, offset.x, 0.0, offset.z, 0.0);
+
                 glBindVertexArray(m_VAO);
                 if (m_wireframe){
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -33,12 +33,42 @@ OpenGLWidget::~OpenGLWidget(){
     delete m_mesoTerrain;
 }
 //----------------------------------------------------------------------------------------------------------------------
+void OpenGLWidget::genFBOs(){
+    // Gen framebuffer
+    glGenFramebuffers(1, &m_reflectFB);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_reflectFB);
+
+    // Bind texture to FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *(m_water->getReflectTex()), 0);
+
+    // Set the targets for the fragment shader output
+    GLenum drawBufs[] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, drawBufs);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Gen framebuffer
+    glGenFramebuffers(1, &m_refractFB);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_refractFB);
+
+    // Bind texture to FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,*(m_water->getRefractTex()), 0);
+
+    // Set the targets for the fragment shader output
+    glDrawBuffers(1, drawBufs);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void OpenGLWidget::initializeGL(){
     glClearDepth(1.0f);
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // enable depth testing for drawing
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CLIP_DISTANCE0);
     glDepthFunc(GL_LESS);
 
     // as re-size is not explicitly called we need to do this.
@@ -59,6 +89,8 @@ void OpenGLWidget::initializeGL(){
     // Create meso level terrain
     m_mesoTerrain = new MesoTerrain();
 
+    genFBOs();
+
     startTimer(0);
 
 }
@@ -74,7 +106,79 @@ void OpenGLWidget::timerEvent(QTimerEvent *){
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+void OpenGLWidget::renderReflections(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, 512, 512);
+
+    //Initialise the model matrix
+    glm::mat4 rotx;
+    glm::mat4 roty;
+
+    rotx = glm::rotate(rotx, m_spinXFace, glm::vec3(1.0, 0.0, 0.0));
+    roty = glm::rotate(roty, m_spinYFace, glm::vec3(0.0, 1.0, 0.0));
+
+    //Initialise the model matrix
+    m_mouseGlobalTX = glm::mat4();
+    m_mouseGlobalTX = rotx*roty;
+    m_mouseGlobalTX[3][0] = m_modelPos.x;
+    m_mouseGlobalTX[3][1] = m_modelPos.y;
+    m_mouseGlobalTX[3][2] = m_modelPos.z;
+
+    // Draw environment map
+    m_modelMatrix = m_mouseGlobalTX;
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(200.0, -200.0, 200.0));
+    m_sky->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    m_sky->render();
+
+    m_modelMatrix = m_mouseGlobalTX;
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, -1.0, 10.0));
+    m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
+    m_geometryClipmap->setWireframe(m_wireframe);
+    m_geometryClipmap->setCutout(m_cutout);
+    m_geometryClipmap->render();
+
+}
+
+void OpenGLWidget::renderRefractions(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, 512, 512);
+
+    //Initialise the model matrix
+    glm::mat4 rotx;
+    glm::mat4 roty;
+
+    rotx = glm::rotate(rotx, m_spinXFace, glm::vec3(1.0, 0.0, 0.0));
+    roty = glm::rotate(roty, m_spinYFace, glm::vec3(0.0, 1.0, 0.0));
+
+    //Initialise the model matrix
+    m_mouseGlobalTX = glm::mat4();
+    m_mouseGlobalTX = rotx*roty;
+    m_mouseGlobalTX[3][0] = m_modelPos.x;
+    m_mouseGlobalTX[3][1] = m_modelPos.y;
+    m_mouseGlobalTX[3][2] = m_modelPos.z;
+
+    m_modelMatrix = m_mouseGlobalTX;
+    m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, 1.0, 10.0));
+    m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
+    m_geometryClipmap->setWireframe(m_wireframe);
+    m_geometryClipmap->setCutout(m_cutout);
+    m_geometryClipmap->render();
+
+}
+
 void OpenGLWidget::paintGL(){
+    glBindFramebuffer(GL_FRAMEBUFFER, m_reflectFB);
+    renderReflections();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_refractFB);
+    renderRefractions();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, width()*2, height()*2);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -100,15 +204,13 @@ void OpenGLWidget::paintGL(){
     m_geometryClipmap->render();
 
     // Draw environment map
-    m_modelMatrix = glm::rotate(m_modelMatrix, m_viewAngle, glm::vec3(0.0, 1.0, 0.0));
+    m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(200.0, 200.0, 200.0));
     m_sky->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     m_sky->render();
 
     // Draw water plane
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.0, 1.5, 0.0));
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(80.0, 80.0, 80.0));
@@ -116,7 +218,6 @@ void OpenGLWidget::paintGL(){
     m_water->render();
 
     // Draw declan's meso terrain
-    glDisable(GL_BLEND);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(5.0, 5.0, 5.0));
     m_mesoTerrain->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());

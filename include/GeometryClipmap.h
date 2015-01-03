@@ -22,6 +22,8 @@ public:
     void createShader();
     // Load the matrices required by the shader
     void loadMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix);
+    void loadClippedMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix);
+
     // create the heightmap, colourmap, normalmap and geometry
     void Initialise();
     // update the heightmap, normalmap colourmap if the camera is moved
@@ -75,6 +77,7 @@ private:
     Texture *m_mudTex;
     Texture *m_rockTex;
     Texture *m_snowTex;
+    Texture *m_sandTex;
     // float to scale terrain heights
     float m_height;
     // used to incriment camera position
@@ -92,6 +95,7 @@ private:
     utils::RendererImage m_colourMap;
     utils::Image m_imageColour;
     utils::WriterBMP m_writerColour;
+
 };
 
 

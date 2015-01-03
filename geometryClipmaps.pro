@@ -115,5 +115,10 @@ OTHER_FILES += \
     shaders/waterVert.glsl \
     shaders/waterFrag.glsl \
     models/mesoTerrain.obj \
-    textures/declanHeightmap.jpg
+    textures/declanHeightmap.jpg \
+    shaders/ripplesVert.glsl \
+    shaders/ripplesFrag.glsl \
+    textures/water_dudv.jpg \
+    textures/water_normal.jpg \
+    shaders/geometryClippedVert.glsl
 

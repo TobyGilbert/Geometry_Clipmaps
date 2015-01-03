@@ -6,15 +6,33 @@ uniform sampler2D mudTexture;
 uniform sampler2D grassTexture;
 uniform sampler2D rockTexture;
 uniform sampler2D snowTexture;
+uniform sampler2D sandTexture;
+
 uniform float mudHeight;
+uniform float sandHeight;
 uniform float grassHeight;
 uniform float rockHeight;
+
 uniform sampler2D colourTexture;
 uniform sampler2D geoTexture;
 uniform sampler2D normalMap;
 uniform sampler2D colourMap;
 uniform mat4 normalMatrix;
 
+//Phong uniforms
+struct lightInfo{
+  vec4 position;
+  vec3 intensity;
+};
+
+uniform lightInfo light;
+
+uniform vec3 Kd;
+uniform vec3 Ka;
+uniform vec3 Ks;
+uniform float shininess;
+
+//fog
 uniform float fogMin;
 uniform float fogMax;
 
@@ -25,12 +43,13 @@ in vec2 texCoords;
 in vec4 position;
 in vec2 vertPos;
 
-vec4 mudColour = texture(mudTexture,texCoords);
-vec4 grassColour = texture(grassTexture,texCoords);
-vec4 rockColour = texture(rockTexture, texCoords);
-vec4 snowColour = texture(snowTexture,texCoords);
+vec4 mudColour = texture(mudTexture,texCoords*10.0);
+vec4 grassColour = texture(grassTexture,texCoords*40.0);
+vec4 rockColour = texture(rockTexture, texCoords*40.0);
+vec4 snowColour = texture(snowTexture,texCoords*40.0);
+vec4 sandColour = texture(sandTexture, texCoords*40.0);
 
-vec4 calcNormals(){
+vec3 calcNormals(){
   const vec2 size = vec2(0.05,0.0);
   const ivec3 off = ivec3(-1,0,1);
   vec4 wave = texture(geoTexture, texCoords);
@@ -41,9 +60,19 @@ vec4 calcNormals(){
   float s12 = (textureOffset(geoTexture, texCoords, off.yz).x + textureOffset(geoTexture, texCoords, off.yz).y + textureOffset(geoTexture, texCoords, off.yz).z);
   vec3 va = normalize(vec3(size.xy,s21-s01));
   vec3 vb = normalize(vec3(size.yx,s12-s10));
-  vec4 bump = vec4( cross(va,vb), s11 );
-//  /bump = vec4(normalMatrix * bump);
+  vec3 bump = vec3( cross(va,vb));
+  bump = mat3(normalMatrix) * bump;
   return bump;
+}
+
+vec3 ads(){
+  vec3 normal = texture(normalMap, texCoords).rgb;
+   vec3 n = normalize(normal);
+   vec3 s = normalize(vec3(light.position) - vec3(position));
+   vec3 v = normalize(vec3(-position));
+   vec3 r = reflect(-s, n);
+   vec3 h = normalize(v + s);
+   return light.intensity * (Ka + Kd * max(dot(s,n),0.0)+ Ks * pow(max(dot(h, n), 0.0), shininess));
 }
 
 vec4 calcColour(){
@@ -59,10 +88,22 @@ vec4 calcColour(){
 //            }
             float x = mudHeight-height;
             if(x<=mixThreshhold){
+                finalColour = mix(sandColour,finalColour,x/mixThreshhold);
+            }
+        }
+        else if(height>mudHeight && height<=sandHeight){
+//            if(angle>30){
+//                finalColour = mix(grassColour,rockColour,((angle-30.0)/60));
+//            }
+//            else{
+                finalColour = sandColour;
+//            }
+            float x = sandHeight-height;
+            if(x<=mixThreshhold){
                 finalColour = mix(grassColour,finalColour,x/mixThreshhold);
             }
         }
-        else if(height>mudHeight && height<=grassHeight){
+        else if(height>sandHeight && height<=grassHeight){
 //            if(angle>30){
 //                finalColour = mix(grassColour,rockColour,((angle-30.0)/60));
 //            }
@@ -104,15 +145,13 @@ vec3 calcFog(vec3 texColour){
 
   float fogFactor = (fogMax - dist) / (fogMax - fogMin);
   fogFactor = clamp(fogFactor, 0.0, 1.0);
-  //fogColour = vec3(1.0, 1.0, 1.0);
   return mix(fogColour, texColour, fogFactor);
 
 }
 
 void main(){
   vec3 texColour = texture(colourMap, texCoords).rgb;
-//  vec3 texColour = texture(geoTexture, texCoords).rgb;
-  vec3 colour = calcFog(texColour);
+  vec3 colour =calcFog(ads() *calcColour().rgb);
   fragColour = vec4(colour, 1.0);
 
   if (cutout){

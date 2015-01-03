@@ -64,6 +64,9 @@ public:
     void mousePressEvent(QMouseEvent *_event);
     // scroll wheel action
     void wheelEvent(QWheelEvent *_event);
+    void renderReflections();
+    void renderRefractions();
+    void genFBOs();
 
 private:
     //----------------------------------------------------------------------------------------------------------------------
@@ -142,6 +145,9 @@ private:
     Water *m_water;
     // Meso terrain object (obj)
     MesoTerrain *m_mesoTerrain;
+
+    GLuint m_reflectFB;
+    GLuint m_refractFB;
 public slots:
     // Scales the height of the terrain
     void setHeight(int _height);

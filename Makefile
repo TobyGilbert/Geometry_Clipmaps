@@ -661,6 +661,8 @@ moc/moc_mainwindow.cpp: /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framewo
 		include/Skybox.h \
 		include/grasshair.h \
 		include/Water.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		include/MesoTerrain.h \
 		include/mainwindow.h
 	/Users/Toby/Qt5.2.1/5.2.1/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 $(INCPATH) include/mainwindow.h -o moc/moc_mainwindow.cpp
@@ -815,6 +817,8 @@ moc/moc_OpenGLWidget.cpp: /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framew
 		include/Skybox.h \
 		include/grasshair.h \
 		include/Water.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		include/MesoTerrain.h \
 		include/OpenGLWidget.h
 	/Users/Toby/Qt5.2.1/5.2.1/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 $(INCPATH) include/OpenGLWidget.h -o moc/moc_OpenGLWidget.cpp
@@ -995,6 +999,8 @@ obj/main.o: src/main.cpp /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framew
 		include/Skybox.h \
 		include/grasshair.h \
 		include/Water.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		include/MesoTerrain.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QFile \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qfile.h
@@ -1154,6 +1160,8 @@ obj/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		include/Skybox.h \
 		include/grasshair.h \
 		include/Water.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		include/MesoTerrain.h \
 		ui_mainwindow.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtWidgets.framework/Versions/5/Headers/QFileDialog \
@@ -1546,9 +1554,7 @@ obj/Model.o: src/Model.cpp include/Model.h \
 		/opt/local/include/glm/detail/func_integer.inl
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Model.o src/Model.cpp
 
-obj/OpenGLWidget.o: src/OpenGLWidget.cpp /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QGuiApplication \
-		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qguiapplication.h \
-		include/OpenGLWidget.h \
+obj/OpenGLWidget.o: src/OpenGLWidget.cpp include/OpenGLWidget.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/QGLWidget \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtOpenGL.framework/Versions/5/Headers/qgl.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QEvent \
@@ -1699,7 +1705,11 @@ obj/OpenGLWidget.o: src/OpenGLWidget.cpp /Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/
 		include/Skybox.h \
 		include/grasshair.h \
 		include/Water.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		include/MesoTerrain.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QGuiApplication \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qguiapplication.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QCursor \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qcursor.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/OpenGLWidget.o src/OpenGLWidget.cpp
@@ -1947,6 +1957,12 @@ obj/GeometryClipmap.o: src/GeometryClipmap.cpp include/GeometryClipmap.h \
 		/opt/local/include/glm/integer.hpp \
 		/opt/local/include/glm/detail/func_integer.hpp \
 		/opt/local/include/glm/detail/func_integer.inl \
+		/opt/local/include/glm/gtc/type_ptr.hpp \
+		/opt/local/include/glm/gtc/quaternion.hpp \
+		/opt/local/include/glm/gtc/constants.hpp \
+		/opt/local/include/glm/gtc/constants.inl \
+		/opt/local/include/glm/gtc/quaternion.inl \
+		/opt/local/include/glm/gtc/type_ptr.inl \
 		/usr/local/include/noise/noise.h \
 		/usr/local/include/noise/module/module.h \
 		/usr/local/include/noise/module/add.h \
@@ -1997,12 +2013,6 @@ obj/GeometryClipmap.o: src/GeometryClipmap.cpp include/GeometryClipmap.h \
 		/opt/local/include/GL/glu_mangle.h \
 		/opt/local/include/IL/il.h \
 		include/Shader.h \
-		/opt/local/include/glm/gtc/type_ptr.hpp \
-		/opt/local/include/glm/gtc/quaternion.hpp \
-		/opt/local/include/glm/gtc/constants.hpp \
-		/opt/local/include/glm/gtc/constants.inl \
-		/opt/local/include/glm/gtc/quaternion.inl \
-		/opt/local/include/glm/gtc/type_ptr.inl \
 		include/Texture.h \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/QImage \
 		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtGui.framework/Versions/5/Headers/qimage.h \
@@ -2445,6 +2455,9 @@ obj/Water.o: src/Water.cpp include/Water.h \
 		/opt/local/include/GL/glu_mangle.h \
 		/opt/local/include/IL/il.h \
 		include/Shader.h \
+		include/Texture.h \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/QTime \
+		/Users/Toby/Qt5.2.1/5.2.1/clang_64/lib/QtCore.framework/Versions/5/Headers/qdatetime.h \
 		/opt/local/include/glm/gtc/type_ptr.hpp \
 		/opt/local/include/glm/gtc/quaternion.hpp \
 		/opt/local/include/glm/gtc/constants.hpp \
