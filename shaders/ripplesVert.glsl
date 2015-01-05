@@ -12,9 +12,11 @@ out vec4 position;
 
 out float time;
 out vec4 pos;
+out vec3 viewPos;
 
 void main()
 {
+  viewPos = vertexPosition;
   vec4 vertex = vec4(vertexPosition, 1.0);
   position = MV * vec4(vertexPosition, 1.0);
   gl_Position = MVP * vec4(vertexPosition, 1.0);

@@ -2,6 +2,7 @@
 
 vec3 LightDirection = vec3(0.0, -1.0, 0.0);
 uniform vec3 viewPos;
+//in vec3 viewPos;
 
 out vec4 fragColour;
 
@@ -58,7 +59,7 @@ void main(){
 
   // Reflection
   vec4 dudvColour = texture(dudv, vec2(TexCoords + distOffset.xy));
-  dudvColour = normalize(dudvColour *2.0 -1.0) * kReflection;
+  dudvColour = normalize(dudvColour * 2.0 -1.0) * kReflection;
 
   // Projection coordinates from http://www.bonzaisoftware.com/tnp/gl-water-tutorial/
   vec4 tmp = vec4(1.0/ pos.w);
@@ -80,6 +81,7 @@ void main(){
   refractionColour += baseColour * depthValue * invertedFresnal;
 
   fragColour = calcFog(reflectionColour + refractionColour);
+//  fragColour = texture(reflectMap, TexCoords);
 //  fragColour = texture(refractMap, TexCoords);
 }
 

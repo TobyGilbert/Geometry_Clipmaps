@@ -22,8 +22,8 @@ public:
     void createShader();
     // Load the matrices required by the shader
     void loadMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix);
-    void loadClippedMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix);
-
+    // Load the matrices required by the clipped shader
+    void loadClippedMatricesToShader(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projectionMatrix, bool _clipped);
     // create the heightmap, colourmap, normalmap and geometry
     void Initialise();
     // update the heightmap, normalmap colourmap if the camera is moved
@@ -53,16 +53,22 @@ private:
     glm::mat4 m_modelMatrix;
     // The shader program and shaders
     ShaderProgram *m_shaderProgram;
+    ShaderProgram *m_clippedProgram;
     Shader *m_vertShader;
     Shader *m_fragShader;
     // uniform shader locations
     GLuint m_modelViewProjectionLoc;
     GLuint m_modelViewLoc;
     GLuint m_heightLoc;
+    GLuint m_clippedHeightLoc;
     GLuint m_cutoutLoc;
+    GLuint m_clippedCutoutLoc;
     GLuint m_geoTextureLoc;
+    GLuint m_clippedGeoTextureLoc;
     GLuint m_normalGeoTexLoc;
+    GLuint m_clippedNormalGeoTexLoc;
     GLuint m_colourLoc;
+    GLuint m_clippedColourLoc;
     // texture handle for the heightmap
     GLuint m_texHeightmap;
     // dictates whether is drawn in wireframe
@@ -95,6 +101,10 @@ private:
     utils::RendererImage m_colourMap;
     utils::Image m_imageColour;
     utils::WriterBMP m_writerColour;
+
+    GLuint m_heightmapPerlin;
+
+
 
 };
 

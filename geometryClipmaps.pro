@@ -120,5 +120,8 @@ OTHER_FILES += \
     shaders/ripplesFrag.glsl \
     textures/water_dudv.jpg \
     textures/water_normal.jpg \
-    shaders/geometryClippedVert.glsl
+    shaders/geometryClippedVert.glsl \
+    textures/myPerlinHeightmap.bmp \
+    textures/normalMap.png \
+    textures/myPerlinNormalMap.bmp
 

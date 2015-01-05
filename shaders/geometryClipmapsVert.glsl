@@ -22,7 +22,7 @@ void main(){
    pos.y = float(texture(geoTexture, pos_map.xz).r * texture(geoTexture, pos_map.xz).g + texture(geoTexture, pos_map.xz).b);
    height = pos.y/3.0;
    pos.y*=heightScale;
-   texCoords = pos_map.xz;
+   texCoords = pos_map.xz / 2.0 + 0.25;
    position =  MV * vec4(pos.x, 1.0, pos.z, pos.w);
    vertPos = pos.xz;
    gl_Position = MVP * pos;

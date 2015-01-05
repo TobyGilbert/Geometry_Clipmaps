@@ -126,18 +126,22 @@ void OpenGLWidget::renderReflections(){
     m_mouseGlobalTX[3][2] = m_modelPos.z;
 
     // Draw environment map
+    m_modelMatrix = glm::mat4(1.0);
+
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(200.0, -200.0, 200.0));
     m_sky->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     m_sky->render();
 
+    m_modelMatrix = glm::mat4(1.0);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, -1.0, 10.0));
     m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     m_geometryClipmap->setWireframe(m_wireframe);
     m_geometryClipmap->setCutout(m_cutout);
     m_geometryClipmap->render();
+
 
 }
 
@@ -160,6 +164,7 @@ void OpenGLWidget::renderRefractions(){
     m_mouseGlobalTX[3][1] = m_modelPos.y;
     m_mouseGlobalTX[3][2] = m_modelPos.z;
 
+    m_modelMatrix = glm::mat4(1.0);
     m_modelMatrix = m_mouseGlobalTX;
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, 1.0, 10.0));
     m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
@@ -197,6 +202,7 @@ void OpenGLWidget::paintGL(){
     m_mouseGlobalTX[3][2] = m_modelPos.z;
 
     m_modelMatrix = m_mouseGlobalTX;
+    m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.0, -1.5, 0.0));
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(10.0, 1.0, 10.0));
     m_geometryClipmap->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     m_geometryClipmap->setWireframe(m_wireframe);
@@ -212,7 +218,6 @@ void OpenGLWidget::paintGL(){
 
     // Draw water plane
     m_modelMatrix = m_mouseGlobalTX;
-    m_modelMatrix = glm::translate(m_modelMatrix, glm::vec3(0.0, 1.5, 0.0));
     m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(80.0, 80.0, 80.0));
     m_water->loadMatricesToShader(m_modelMatrix, m_cam->getViewMatrix(), m_cam->getProjectionMatrix());
     m_water->render();
